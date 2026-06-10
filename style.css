@@ -1,0 +1,431 @@
+/* Root variables: define global color & style constants */
+:root {
+  --bg: #f7f9fc;
+  --surface: #ffffff;
+  --card: #ffffff;
+  --line: #e2e8f0;
+  --line2: #cbd5e1;
+
+  --ink: #1e293b;
+  --ink2: #64748b;
+  --ink3: #94a3b8;
+
+  --acc: #3b82f6;
+  --acc2: #2563eb;
+  --hit: #10b981;
+  --miss: #ef4444;
+  --warn: #f59e0b;
+  --cursor: #3b82f6;
+}
+
+/* Global reset: unify box model, remove default margin & padding */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* Base body layout and global font settings */
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2.5rem 1rem 4rem;
+}
+
+/* Background dot pattern decoration, non-interactive */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(59,130,246,0.08) 1px, transparent 1px);
+  background-size: 30px 30px;
+  pointer-events: none;
+}
+
+/* Main wrapper for all game content */
+.wrap {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 780px;
+}
+
+/* Header area: logo and tagline */
+.header { margin-bottom: 2.5rem; }
+.logo {
+  font-size: clamp(2rem, 5vw, 3.2rem); /* Responsive font size */
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--ink);
+}
+.logo span { color: var(--acc); } /* Highlight part of game name */
+.tagline {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--ink2);
+  letter-spacing: 0.12em;
+  margin-top: 0.35rem;
+}
+
+/* Page screen switching logic: hide inactive screens */
+.screen { display: none; }
+.screen.active { display: block; }
+/* Category selection grid layout */
+.select-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 2.5rem;
+}
+
+/* Category card style and hover animation */
+.cat-card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1.2rem 1.3rem 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+/* Bottom accent line animation on hover */
+.cat-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--cat-color, var(--acc));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s;
+}
+.cat-card:hover {
+  border-color: var(--acc);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.08);
+}
+.cat-card:hover::after { transform: scaleX(1); }
+
+/* Elements inside category card */
+.cat-icon { font-size: 1.5rem; margin-bottom: 0.6rem; display: block; }
+.cat-name { font-size: 0.9rem; font-weight: 600; color: var(--ink); margin-bottom: 0.2rem; }
+.cat-desc {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--ink2);
+  line-height: 1.5;
+}
+.cat-count {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--cat-color, var(--acc));
+  margin-top: 0.6rem;
+}
+
+/* Difficulty button row layout */
+.diff-row { display: flex; gap: 8px; margin-bottom: 2.5rem; flex-wrap: wrap; }
+/* Difficulty button style */
+.diff-btn {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 18px;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--ink2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.diff-btn:hover { border-color: var(--line2); color: var(--ink); }
+.diff-btn.active {
+  border-color: var(--acc);
+  background: rgba(59,130,246,0.1);
+  color: var(--acc);
+}
+
+/* Section label style for selection area */
+.select-label {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  color: var(--ink3);
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+}
+
+/* Game top bar: exit button, category name & stats */
+.game-top { display: flex; align-items: center; gap: 12px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+.btn-back {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--ink2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-back:hover { border-color: var(--line2); color: var(--ink); }
+.game-cat { font-size: 0.8rem; font-weight: 600; color: var(--cat-color, var(--acc)); flex: 1; }
+
+/* Real-time game statistics row */
+.stats-row { display: flex; gap: 8px; }
+.stat-pill {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 5px 14px;
+  text-align: center;
+  min-width: 64px;
+}
+.stat-pill .sl {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.55rem;
+  color: var(--ink3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.stat-pill .sv {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-top: 1px;
+}
+.stat-pill .sv.green { color: var(--hit); }
+.stat-pill .sv.red { color: var(--miss); }
+.stat-pill .sv.violet { color: var(--acc); }
+
+/* Time progress bar container */
+.timer-wrap {
+  height: 6px;
+  background: var(--line);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+/* Dynamic time progress fill */
+.timer-fill {
+  height: 100%;
+  background: var(--acc);
+  border-radius: 3px;
+  transition: width 0.1s linear, background 0.3s;
+}
+
+/* Target word display container */
+.word-display {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 1.6rem 2rem;
+  margin-bottom: 1rem;
+  min-height: 110px;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+/* Word progress indicator */
+.word-progress {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--ink3);
+  margin-bottom: 0.8rem;
+  letter-spacing: 0.1em;
+}
+/* Target word main display */
+.word-target {
+  font-family: 'Roboto Mono', monospace;
+  font-size: clamp(1.5rem, 4vw, 2.2rem);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+}
+/* Single letter style & state classes */
+.letter { position: relative; transition: color 0.06s; }
+.letter.correct { color: var(--hit); }
+.letter.wrong { color: var(--miss); text-decoration: underline; }
+.letter.pending { color: var(--ink3); }
+.letter.active { color: var(--ink); }
+/* Blinking cursor under active letter */
+.letter.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 0; right: 0;
+  height: 2px;
+  background: var(--cursor);
+  border-radius: 1px;
+  animation: blink 0.7s step-end infinite;
+}
+/* Cursor blink animation */
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+.word-hint {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--ink2);
+  margin-top: 1rem;
+  font-style: italic;
+  border-top: 1px solid var(--line);
+  padding-top: 0.6rem;
+}
+
+/* Text input area layout */
+.input-row { display: flex; gap: 10px; margin-bottom: 1rem; }
+/* Typing input box style */
+.type-input {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.75rem 1.1rem;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 1.1rem;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.12s;
+  caret-color: var(--cursor);
+}
+.type-input:focus { border-color: var(--acc); }
+/* Flash effect for correct/wrong input */
+.type-input.correct-flash { border-color: var(--hit); }
+.type-input.wrong-flash { border-color: var(--miss); }
+
+/* Upcoming words queue layout */
+.queue-row { display: flex; gap: 8px; margin-bottom: 1.5rem; overflow: hidden; }
+.queue-word {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--ink3);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 3px 10px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.queue-word.next { color: var(--ink2); border-color: var(--line2); }
+
+/* Real-time feedback message area */
+.feedback-strip { display: flex; gap: 6px; align-items: center; margin-bottom: 1.5rem; min-height: 24px; }
+.fb-badge {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.68rem;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid;
+  animation: pop-in 0.15s ease;
+}
+/* Pop up animation for feedback badge */
+@keyframes pop-in { from{transform:scale(.7);opacity:0} to{transform:scale(1);opacity:1} }
+.fb-badge.correct { color: var(--hit); border-color: var(--hit); background: rgba(16,185,129,0.08); }
+.fb-badge.wrong { color: var(--miss); border-color: var(--miss); background: rgba(239,68,68,0.08); }
+
+/* Result page grid layout */
+.result-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 2rem; }
+/* Result data block style */
+.result-block {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 1.2rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+/* Full width block for chart & word list */
+.result-block.wide { grid-column: 1/-1; }
+.rb-label {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--ink3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.35rem;
+}
+.rb-val {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 2.2rem;
+  font-weight: 600;
+  line-height: 1;
+}
+/* Result value color variants */
+.rb-val.violet { color: var(--acc); }
+.rb-val.green { color: var(--hit); }
+.rb-val.amber { color: var(--warn); }
+.rb-val.red { color: var(--miss); }
+/* Result page title text */
+.result-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 0.25rem; color: var(--ink); }
+.result-sub {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--ink2);
+  margin-bottom: 2rem;
+}
+/* Missed words list on result page */
+.missed-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 0.5rem; }
+.missed-word {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--miss);
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.25);
+  border-radius: 6px;
+  padding: 2px 9px;
+}
+/* Bottom button row on result page */
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.game-btn {
+  background: transparent;
+  border: 1px solid var(--line2);
+  border-radius: 8px;
+  padding: 9px 22px;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink2);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.game-btn:hover { border-color: var(--ink2); color: var(--ink); }
+/* Primary highlighted button */
+.game-btn.primary { border-color: var(--acc); color: var(--acc); }
+.game-btn.primary:hover { background: rgba(59,130,246,0.1); }
+
+/* Fullscreen countdown overlay before game starts */
+.countdown {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(247,249,252,0.92);
+  z-index: 100;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 6rem;
+  font-weight: 700;
+  color: var(--acc);
+  letter-spacing: -0.05em;
+}
+/* Count number pop animation */
+.countdown.hidden { display: none; }
+@keyframes count-pop { from{transform:scale(1.4);opacity:0} to{transform:scale(1);opacity:1} }
+.countdown .cn { animation: count-pop 0.3s ease; }
+
+/* WPM bar chart container & segment style */
+.bar-chart { display: flex; align-items: flex-end; gap: 4px; height: 50px; margin-top: 0.5rem; }
+.bar-seg {
+  flex: 1;
+  background: var(--acc);
+  border-radius: 3px 3px 0 0;
+  opacity: 0.7;
+  min-height: 3px;
+  transition: height 0.3s ease;
+}
